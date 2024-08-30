@@ -1,0 +1,88 @@
+const Grade = require("../schemas/Grade");
+
+// get all grades
+const getAllGrades = async (req, res) => {
+  try {
+    const grades = await Grade.find();
+    if (!grades.length) {
+      res.status(200).json({ msg: "No grades in the DB" });
+    } else {
+      res.status(200).json({ grades });
+    }
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+// get one grade
+const getOneGrade = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const grade = await Grade.findById(id);
+
+    if (grade) {
+      return res.status(200).json(grade);
+    }
+    res.status(404).json({ msg: "Grade not found :(" });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+// create a new grade
+const createGrade = async (req, res) => {
+  try {
+    const { grade_name, description } = req.body;
+    const grade = await Grade.create({ grade_name, description });
+    res.status(201).json(grade);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+// update a grade
+const updateGrade = async (req, res) => {
+  try {
+    const { grade_name, description } = req.body;
+    const { id } = req.params;
+
+    const grade = await Grade.findByIdAndUpdate(
+      id,
+      { grade_name, description },
+      { new: true }
+    );
+
+    if (!grade) {
+      res.status(404).json({ msg: "Grade not found :(" });
+    } else {
+      res.status(200).json({ msg: "Grade updated successfully", grade });
+    }
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+// delete a grade
+const deleteGrade = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const grade = await Grade.findByIdAndDelete(id);
+
+    if (!grade) {
+      res.status(404).json({ msg: "Grade not found :(" });
+    } else {
+      res.status(200).json({ msg: "Grade deleted successfully", grade });
+    }
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+module.exports = {
+  getAllGrades,
+  getOneGrade,
+  createGrade,
+  updateGrade,
+  deleteGrade,
+};
